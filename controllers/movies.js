@@ -34,11 +34,10 @@ module.exports.createMovie = (req, res, next) => {
     .then((movie) => res.status(200).send({ data: movie }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new ValidationError('Неверно заполнены данные фильма');
+        next(new ValidationError('Неверно заполнены данные фильма'));
       }
       next(err);
-    })
-    .catch(next);
+    });
 };
 
 module.exports.getMovies = (req, res, next) => {
@@ -61,9 +60,8 @@ module.exports.deleteMovie = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new ValidationError('Запрашиваемый фильм не найден');
+        next(new ValidationError('Запрашиваемый фильм не найден'));
       }
       next(err);
-    })
-    .catch(next);
+    });
 };

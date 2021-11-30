@@ -16,13 +16,12 @@ module.exports.createUser = (req, res, next) => {
       .then(({ _id }) => res.status(200).send({ email, name, _id }))
       .catch((err) => {
         if (err.name === 'ValidationError') {
-          throw new ValidationError('Переданы некорректные данные при создании пользователя.');
+          next(new ValidationError('Переданы некорректные данные при создании пользователя.'));
         }
         if (err.name === 'MongoServerError' && err.code === 11000) {
-          throw new ConflictError('Пользователь с таким email уже существует');
+          next(new ConflictError('Пользователь с таким email уже существует'));
         }
-      }))
-    .catch(next);
+      }));
 };
 
 module.exports.login = (req, res, next) => {
@@ -48,18 +47,16 @@ module.exports.logOut = (req, res, next) => {
       sameSite: 'none',
     }).send({ message: 'Выход осуществлен' });
   } catch (err) {
-    res.status(500).send(err);
+    next();
   }
-  next();
 };
 
 module.exports.getUser = (req, res, next) => {
   User.findOne({ _id: req.user._id })
     .then(({ email, name }) => res.send({ email, name }))
     .catch(() => {
-      throw new UnauthorizedError('Необходима авторизацияа');
-    })
-    .catch(next);
+      next(new UnauthorizedError('Необходима авторизацияа'));
+    });
 };
 
 module.exports.updateUserProfile = (req, res, next) => {
@@ -77,14 +74,13 @@ module.exports.updateUserProfile = (req, res, next) => {
           })
           .catch((err) => {
             if (err.name === 'ValidationError') {
-              throw new ValidationError('Переданы некорректные данные при обновлении профиля.');
+              next(new ValidationError('Переданы некорректные данные при обновлении профиля.'));
             }
             if (err.name === 'CastError') {
-              throw new ValidationError('Неверный Id пользователя');
+              next(new ValidationError('Неверный Id пользователя'));
             }
             next(err);
-          })
-          .catch(next);
+          });
       } else {
         throw new ConflictError('Указанный email принадлежит другому пользователю');
       }

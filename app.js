@@ -19,7 +19,7 @@ const app = express();
 
 app.use(helmet());
 
-mongoose.connect(NODE_ENV === 'production' ? NSQL : 'mongodb://localhost:27017/bitfilmsdb', {
+mongoose.connect(NODE_ENV === 'production' ? NSQL : 'mongodb://localhost:27017/moviesdb', {
   useNewUrlParser: true,
 });
 
@@ -29,9 +29,9 @@ app.use(cookieParser());
 
 app.use(requestLogger);
 
-app.use('*', cors(options));
-
 app.use(limiter);
+
+app.use('*', cors(options));
 
 app.use(routes);
 
