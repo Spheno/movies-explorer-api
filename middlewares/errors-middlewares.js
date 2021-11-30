@@ -5,4 +5,5 @@ module.exports = function (err, req, res, next) {
       ? 'На сервере произошла ошибка'
       : message,
   });
+  next();
 };

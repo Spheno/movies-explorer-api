@@ -15,7 +15,7 @@ router.post('/', celebrate({
     image: Joi.string().required().custom(isUrl),
     trailer: Joi.string().required().custom(isUrl),
     thumbnail: Joi.string().required().custom(isUrl),
-    movieId: Joi.string().required(),
+    movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
   }),
@@ -28,5 +28,3 @@ router.delete('/:movieId', celebrate({
 }), deleteMovie);
 
 module.exports = router;
-
-//проверитиьь длинну айдишника фильмов для удаления

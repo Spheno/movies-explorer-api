@@ -13,7 +13,7 @@ module.exports.createUser = (req, res, next) => {
   const { email, password, name } = req.body;
   bcrypt.hash(password, SALT_ROUND)
     .then((hash) => User.create({ email, name, password: hash })
-      .then(({ email, name, _id }) => res.status(200).send({ email, name, _id }))
+      .then(({ _id }) => res.status(200).send({ email, name, _id }))
       .catch((err) => {
         if (err.name === 'ValidationError') {
           throw new ValidationError('Переданы некорректные данные при создании пользователя.');
@@ -32,7 +32,9 @@ module.exports.login = (req, res, next) => {
       res.cookie(
         'jwt',
         jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'big-scary-secret', { expiresIn: '7d' }),
-        { maxAge: 3600000 * 24 * 7, httpOnly: true, sameSite: 'none', secure: true },
+        {
+          maxAge: 3600000 * 24 * 7, httpOnly: true, sameSite: 'none', secure: true,
+        },
       );
       res.status(200).send({ message: req.cookies.jwt });
     })
@@ -48,6 +50,7 @@ module.exports.logOut = (req, res, next) => {
   } catch (err) {
     res.status(500).send(err);
   }
+  next();
 };
 
 module.exports.getUser = (req, res, next) => {
@@ -62,21 +65,29 @@ module.exports.getUser = (req, res, next) => {
 module.exports.updateUserProfile = (req, res, next) => {
   const { email, name } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { email, name }, { new: true, runValidators: true })
+  User.findOne({ email })
     .then((user) => {
-      if (user) {
-        return res.send({ data: user });
+      if (!user || req.user._id === user.id) {
+        User.findByIdAndUpdate(req.user._id, { email, name }, { new: true, runValidators: true })
+          .then((curentUser) => {
+            if (curentUser) {
+              return res.send({ data: curentUser });
+            }
+            throw new NotFoundError('Пользователя с таким id не существует');
+          })
+          .catch((err) => {
+            if (err.name === 'ValidationError') {
+              throw new ValidationError('Переданы некорректные данные при обновлении профиля.');
+            }
+            if (err.name === 'CastError') {
+              throw new ValidationError('Неверный Id пользователя');
+            }
+            next(err);
+          })
+          .catch(next);
+      } else {
+        throw new ConflictError('Указанный email принадлежит другому пользователю');
       }
-      throw new NotFoundError('Пользователя с таким id не существует');
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new ValidationError('Переданы некорректные данные при обновлении профиля.');
-      }
-      if (err.name === 'CastError') {
-        throw new ValidationError('Неверный Id пользователя');
-      }
-      next(err);
     })
     .catch(next);
 };

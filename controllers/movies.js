@@ -4,7 +4,8 @@ const ValidationError = require('../errors/validation-err');
 const ForbiddenError = require('../errors/forbidden-err');
 
 module.exports.createMovie = (req, res, next) => {
-  const { country,
+  const {
+    country,
     director,
     duration,
     year,
@@ -14,7 +15,8 @@ module.exports.createMovie = (req, res, next) => {
     thumbnail,
     movieId,
     nameRU,
-    nameEN } = req.body;
+    nameEN,
+  } = req.body;
   Movie.create({
     country,
     director,
@@ -52,11 +54,10 @@ module.exports.deleteMovie = (req, res, next) => {
         throw new NotFoundError('Фильма с таким id не существует');
       }
       if (movie.owner.toString() === req.user._id) {
-        Movie.deleteOne(movie)
+        return Movie.deleteOne(movie)
           .then(() => res.send({ data: movie }));
-      } else {
-        throw new ForbiddenError('Можно удалять фильмы только из своей библиотеки');
       }
+      throw new ForbiddenError('Можно удалять фильмы только из своей библиотеки');
     })
     .catch((err) => {
       if (err.name === 'CastError') {
