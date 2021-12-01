@@ -1,11 +1,20 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const { SALT_ROUND } = require('../utils/constants');
+const { SALT_ROUND, DEV_SECRET } = require('../utils/config');
 const NotFoundError = require('../errors/not-found-err');
 const ValidationError = require('../errors/validation-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
 const ConflictError = require('../errors/conflict-err');
+const {
+  conflictErrorText,
+  userIdErrorText,
+  notFoundUserIdText,
+  updateUserErrorText,
+  unauthorizedErrorText,
+  createUserErrorText,
+  logOutMessage,
+} = require('../utils/constants');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -16,10 +25,10 @@ module.exports.createUser = (req, res, next) => {
       .then(({ _id }) => res.status(200).send({ email, name, _id }))
       .catch((err) => {
         if (err.name === 'ValidationError') {
-          next(new ValidationError('Переданы некорректные данные при создании пользователя.'));
+          next(new ValidationError(createUserErrorText));
         }
         if (err.name === 'MongoServerError' && err.code === 11000) {
-          next(new ConflictError('Пользователь с таким email уже существует'));
+          next(new ConflictError(conflictErrorText));
         }
       }));
 };
@@ -30,7 +39,7 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       res.cookie(
         'jwt',
-        jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'big-scary-secret', { expiresIn: '7d' }),
+        jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : DEV_SECRET, { expiresIn: '7d' }),
         {
           maxAge: 3600000 * 24 * 7, httpOnly: true, sameSite: 'none', secure: true,
         },
@@ -45,7 +54,7 @@ module.exports.logOut = (req, res, next) => {
     res.clearCookie('jwt', {
       secure: true,
       sameSite: 'none',
-    }).send({ message: 'Выход осуществлен' });
+    }).send({ message: logOutMessage });
   } catch (err) {
     next();
   }
@@ -55,7 +64,7 @@ module.exports.getUser = (req, res, next) => {
   User.findOne({ _id: req.user._id })
     .then(({ email, name }) => res.send({ email, name }))
     .catch(() => {
-      next(new UnauthorizedError('Необходима авторизацияа'));
+      next(new UnauthorizedError(unauthorizedErrorText));
     });
 };
 
@@ -70,19 +79,19 @@ module.exports.updateUserProfile = (req, res, next) => {
             if (curentUser) {
               return res.send({ data: curentUser });
             }
-            throw new NotFoundError('Пользователя с таким id не существует');
+            throw new NotFoundError(notFoundUserIdText);
           })
           .catch((err) => {
             if (err.name === 'ValidationError') {
-              next(new ValidationError('Переданы некорректные данные при обновлении профиля.'));
+              next(new ValidationError(updateUserErrorText));
             }
             if (err.name === 'CastError') {
-              next(new ValidationError('Неверный Id пользователя'));
+              next(new ValidationError(userIdErrorText));
             }
             next(err);
           });
       } else {
-        throw new ConflictError('Указанный email принадлежит другому пользователю');
+        throw new ConflictError(conflictErrorText);
       }
     })
     .catch(next);

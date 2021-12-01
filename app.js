@@ -10,6 +10,7 @@ const errorsMiddlewares = require('./middlewares/errors-middlewares');
 const options = require('./middlewares/options');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const limiter = require('./middlewares/limiter');
+const { DATABASE } = require('./utils/config');
 
 const { NODE_ENV, NSQL } = process.env;
 
@@ -19,7 +20,7 @@ const app = express();
 
 app.use(helmet());
 
-mongoose.connect(NODE_ENV === 'production' ? NSQL : 'mongodb://localhost:27017/moviesdb', {
+mongoose.connect(NODE_ENV === 'production' ? NSQL : DATABASE, {
   useNewUrlParser: true,
 });
 

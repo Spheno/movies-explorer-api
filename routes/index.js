@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const NotFoundError = require('../errors/not-found-err');
+const { notFoundErrorText } = require('../utils/constants');
 const { createUser, login, logOut } = require('../controllers/users');
 const auth = require('../middlewares/auth');
 const userRouter = require('./users');
@@ -30,7 +31,7 @@ router.use('/movies', movieRouter);
 
 router.use((req, res, next) => {
   try {
-    throw new NotFoundError('Страница не найдена');
+    throw new NotFoundError(notFoundErrorText);
   } catch (err) {
     next(err);
   }
