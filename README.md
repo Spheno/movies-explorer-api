@@ -4,4 +4,4 @@
 
 ### [Ссылка на страницу на Яндекс.Облаке backend](http://api.movie-list.nomoredomains.rocks)
 
-Мспользуются Node + Express.
+Используются Node + Express.
