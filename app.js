@@ -14,7 +14,7 @@ const { DATABASE } = require('./utils/config');
 
 const { NODE_ENV, NSQL } = process.env;
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3001 } = process.env;
 
 const app = express();
 
