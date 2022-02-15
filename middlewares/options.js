@@ -2,8 +2,8 @@ const options = {
   origin: [
     'http://localhost:3000',
     'http://51.250.0.11',
-    'http://movie-list.nomoredomains.rocks',
-    'https://movie-list.nomoredomains.rocks',
+    'http://movie-list.nomoredomains.xyz',
+    'https://movie-list.nomoredomains.xyz',
     'http://api.nomoreparties.co/beatfilm-movies',
     'https://api.nomoreparties.co/beatfilm-movies',
   ],

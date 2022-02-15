@@ -2,6 +2,6 @@
 
 Сервис, в котором можно найти фильмы по запросу и сохранить в личном кабинете.
 
-### [Ссылка на страницу на Яндекс.Облаке backend](http://api.movie-list.nomoredomains.rocks)
+### [Ссылка на страницу на Яндекс.Облаке backend](http://api.movie-list.nomoredomains.xyz)
 
 Используются Node + Express.
