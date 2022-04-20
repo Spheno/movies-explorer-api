@@ -1,6 +1,6 @@
 const options = {
   origin: [
-    'http://localhost:3000',
+    'http://localhost:3001',
     'http://51.250.0.11',
     'http://movie-list.nomoredomains.xyz',
     'https://movie-list.nomoredomains.xyz',
