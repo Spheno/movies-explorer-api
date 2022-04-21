@@ -43,7 +43,7 @@ git clone https://github.com/Spheno/movies-explorer-api.git
 npm install
 ```
 
-Для корректной работы потребуется установленная и запущенная MongoDB.
+Для корректной работы потребуется установленная и запущенная MongoDB версии 5.0 и выше.
 
 Официальная инструкция для установки и запуска MongoDB - https://www.mongodb.com/docs/manual/administration/install-community/
 
